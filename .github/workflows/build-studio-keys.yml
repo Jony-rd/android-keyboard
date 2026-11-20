@@ -1,0 +1,113 @@
+name: Build 64-bit APK (Studio Keys)
+
+# Manual build: Actions -> "Build 64-bit APK (Studio Keys)" -> Run workflow.
+# Produces one arm64-v8a APK and uploads it as a downloadable artifact.
+on:
+  workflow_dispatch:
+    inputs:
+      flavor:
+        description: 'Flavor'
+        required: true
+        default: unstable
+        type: choice
+        options:
+          - unstable
+          - stable
+      build_type:
+        description: 'Build type'
+        required: true
+        default: release
+        type: choice
+        options:
+          - release
+          - debug
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout source (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install Android NDK and CMake
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [[ ! -x "$SDKMANAGER" ]]; then
+            SDKMANAGER="$(command -v sdkmanager)"
+          fi
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" "ndk;28.2.13676358" "cmake;3.22.1"
+
+      - name: Build arm64 APK
+        shell: bash
+        env:
+          VERSION_NAME: studio-${{ github.run_number }}
+          VERSION_CODE: ${{ github.run_number }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          FLAVOR: ${{ inputs.flavor }}
+          BUILD_TYPE: ${{ inputs.build_type }}
+        run: |
+          set -euo pipefail
+          case "$FLAVOR" in
+            unstable) F=Unstable ;;
+            stable)   F=Stable ;;
+            *) echo "Unknown flavor: $FLAVOR"; exit 1 ;;
+          esac
+          case "$BUILD_TYPE" in
+            release) B=Release ;;
+            debug)   B=Debug ;;
+            *) echo "Unknown build type: $BUILD_TYPE"; exit 1 ;;
+          esac
+          ./gradlew --no-daemon --stacktrace ":assemble$F$B" -Parm64Only
+
+      - name: Show generated APKs
+        shell: bash
+        run: |
+          set -euo pipefail
+          find build/outputs/apk -type f -name '*.apk' -print
+
+      - name: Verify the APK is arm64-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t apks < <(find build/outputs/apk -type f -name '*.apk' -print)
+          if [[ "${#apks[@]}" -ne 1 ]]; then
+            echo "Expected exactly one APK, found ${#apks[@]}"
+            printf '%s\n' "${apks[@]}"
+            exit 1
+          fi
+          apk="${apks[0]}"
+          echo "APK: $apk"
+          libs="$(unzip -Z1 "$apk" | grep -E '^lib/' | cut -d/ -f2 | sort -u || true)"
+          echo "Native ABIs in APK:"
+          echo "$libs"
+          if [[ "$libs" != "arm64-v8a" ]]; then
+            echo "APK is not arm64-only"
+            exit 1
+          fi
+          echo "APK_PATH=$apk" >> "$GITHUB_ENV"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: StudioKeys-${{ inputs.flavor }}-${{ inputs.build_type }}-arm64
+          path: build/outputs/apk/**/*.apk
+          if-no-files-found: error

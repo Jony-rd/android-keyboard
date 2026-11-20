@@ -201,10 +201,19 @@ android {
         versionName getVersionName()
         versionCode getVersionCode()
 
-        applicationId 'org.futo.inputmethod.latin'
-        testApplicationId 'org.futo.inputmethod.latin.tests'
+        // Personal build identity so it can be installed next to the official FUTO Keyboard.
+        // The Java/Kotlin package (namespace) is deliberately unchanged.
+        applicationId 'app.studiokeys'
+        testApplicationId 'app.studiokeys.tests'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = false
+
+        // CI builds only the arm64 library set (-Parm64Only): one smaller APK, faster native build.
+        if (project.hasProperty('arm64Only')) {
+            ndk {
+                abiFilters 'arm64-v8a'
+            }
+        }
     }
 
     bundle {
@@ -369,6 +378,9 @@ android {
 
     aaptOptions {
         noCompress 'dict'
+        noCompress 'lm'
+        noCompress 'lmo'
+        noCompress 'nnlm'
     }
 
     packagingOptions {
