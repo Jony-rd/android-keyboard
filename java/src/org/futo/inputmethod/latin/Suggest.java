@@ -29,6 +29,7 @@ import org.futo.inputmethod.latin.common.StringUtils;
 import org.futo.inputmethod.latin.define.DebugFlags;
 import org.futo.inputmethod.latin.settings.SettingsValuesForSuggestion;
 import org.futo.inputmethod.latin.utils.AutoCorrectionUtils;
+import org.futo.inputmethod.latin.utils.CompletionRanker;
 import org.futo.inputmethod.latin.utils.BinaryDictionaryUtils;
 import org.futo.inputmethod.latin.utils.SuggestionResults;
 
@@ -164,6 +165,23 @@ public final class Suggest {
             final Locale locale, final SuggestionResults suggestionResults,
             final float autoCorrectionThreshold, final boolean numberRowActive
     ) {
+        return obtainNonBatchedInputSuggestedWords(wordComposer, inputStyleIfNotPrediction,
+                isCorrectionEnabled, sequenceNumber, locale, suggestionResults,
+                autoCorrectionThreshold, numberRowActive, false /* suppressAutoCorrection */);
+    }
+
+    /**
+     * Same as above, but the caller may veto auto-correction for this word while still keeping the
+     * correction available in the suggestion strip (used when the typed word is already a real
+     * word of the language).
+     */
+    public static SuggestedWords obtainNonBatchedInputSuggestedWords(
+            final WordComposer wordComposer, final int inputStyleIfNotPrediction,
+            final boolean isCorrectionEnabled, final int sequenceNumber,
+            final Locale locale, final SuggestionResults suggestionResults,
+            final float autoCorrectionThreshold, final boolean numberRowActive,
+            final boolean suppressAutoCorrection
+    ) {
         final String typedWordString = wordComposer.getTypedWord();
         final int trailingSingleQuotesCount =
                 StringUtils.getTrailingSingleQuotesCount(typedWordString);
@@ -210,6 +228,8 @@ public final class Suggest {
         // If correction is not enabled, we never auto-correct. This is for example for when
         // the setting "Auto-correction" is "off": we still suggest, but we don't auto-correct.
         if (!isCorrectionEnabled
+                // The caller vetoed auto-correction for this word.
+                || suppressAutoCorrection
                 // If the word does not allow to be auto-corrected, then we don't auto-correct.
                 || !allowsToBeAutoCorrected
                 // If we are doing prediction, then we never auto-correct of course
@@ -335,6 +355,11 @@ public final class Suggest {
                 wordComposer.getComposedDataSnapshot(), ngramContext, keyboard,
                 settingsValuesForSuggestion, SESSION_ID_TYPING, inputStyleIfNotPrediction);
         final Locale locale = mDictionaryFacilitator.getPrimaryLocale();
+
+        // Studio Keys: keep a real completion of the typed prefix in view (used when the
+        // transformer path is not in charge of this update).
+        CompletionRanker.promoteCompletionOfTypedWord(suggestionResults,
+                wordComposer.getTypedWord(), 2);
 
         callback.onGetSuggestedWords(
             obtainNonBatchedInputSuggestedWords(wordComposer, inputStyleIfNotPrediction,

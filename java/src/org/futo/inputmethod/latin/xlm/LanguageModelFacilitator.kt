@@ -30,6 +30,7 @@ import org.futo.inputmethod.latin.settings.Settings
 import org.futo.inputmethod.latin.uix.SettingsKey
 import org.futo.inputmethod.latin.uix.USE_TRANSFORMER_FINETUNING
 import org.futo.inputmethod.latin.uix.getSetting
+import org.futo.inputmethod.latin.utils.CompletionRanker
 import org.futo.inputmethod.latin.utils.SuggestionResults
 import kotlin.math.ceil
 
@@ -371,6 +372,29 @@ public class LanguageModelFacilitator(
         val locale = dictionaryFacilitator.primaryLocale ?: return null
         val wordComposer = inputLogic.mWordComposer ?: return null
 
+        // The strip shows two suggestions next to the typed word, so that is how many ranked
+        // entries we have to work with.
+        CompletionRanker.promoteCompletionOfTypedWord(
+            suggestionResults,
+            values.composedData.mTypedWord,
+            2
+        )
+
+        // Studio Keys: do not silently extend a word the user already finished typing. If "hell"
+        // is a real word, it must never be committed as "hello" behind the user's back; "hello"
+        // stays in the strip as a tap target instead. Typical typos ("teh", "adn") are untouched.
+        val typedWord = values.composedData.mTypedWord.trim()
+        val typedWordIsRealWord = typedWord.length > 1 && suggestedWordsDictList.any {
+            it.mWord.equals(typedWord, ignoreCase = true) &&
+                    it.mSourceDict != null &&
+                    it.mSourceDict?.mDictType != Dictionary.TYPE_USER_HISTORY
+        }
+        val topSuggestion = suggestionResults.firstOrNull()?.mWord?.lowercase()
+        val topSuggestionIsAnExtension = topSuggestion != null &&
+                topSuggestion.length > typedWord.length &&
+                topSuggestion.startsWith(typedWord.lowercase())
+        val suppressAutocorrect = typedWordIsRealWord && topSuggestionIsAnExtension
+
         val suggestedWords = Suggest.obtainNonBatchedInputSuggestedWords(
             wordComposer,
             values.inputStyle,
@@ -379,7 +403,8 @@ public class LanguageModelFacilitator(
             locale,
             suggestionResults,
             settingsValues.mAutoCorrectionThreshold,
-            settingsValues.mIsNumberRowEnabled
+            settingsValues.mIsNumberRowEnabled,
+            suppressAutocorrect
         )
 
 
