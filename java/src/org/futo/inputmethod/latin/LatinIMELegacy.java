@@ -631,9 +631,13 @@ public class LatinIMELegacy implements KeyboardActionListener,
 
     @Override
     public void onMovePointer(int steps) {
+        // Studio Keys: moving the cursor with the spacebar always moves the cursor. Passing null
+        // here made InputLogic derive the flag from the current shift state, so a swipe could
+        // grow a text selection whenever shift happened to be on. Selecting with shift is still
+        // available from the arrow keys in the action panel, which pass the flag explicitly.
         mImeManager.getActiveIME(
                 mSettings.getCurrent()
-        ).onMovePointer(steps, false, null);
+        ).onMovePointer(steps, false, false);
     }
 
     @Override

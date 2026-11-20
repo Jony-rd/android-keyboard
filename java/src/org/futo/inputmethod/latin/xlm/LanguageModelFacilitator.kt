@@ -372,12 +372,12 @@ public class LanguageModelFacilitator(
         val locale = dictionaryFacilitator.primaryLocale ?: return null
         val wordComposer = inputLogic.mWordComposer ?: return null
 
-        // The strip shows two suggestions next to the typed word, so that is how many ranked
-        // entries we have to work with.
+        // The strip now has four word slots, so a completion can be visible a bit further down
+        // the ranking than before.
         CompletionRanker.promoteCompletionOfTypedWord(
             suggestionResults,
             values.composedData.mTypedWord,
-            2
+            3
         )
 
         // Studio Keys: do not silently extend a word the user already finished typing. If "hell"

@@ -501,41 +501,55 @@ fun RowScope.SuggestionItems(words: SuggestedWords, onClick: (i: Int) -> Unit, o
         }
     }
 
-    when {
+    // Studio Keys: the strip has four word slots instead of three. A slot is only drawn when
+    // there is actually a suggestion for it, so the remaining words never get squeezed into an
+    // empty fourth box.
+    val slots: List<SuggestedWordInfo?> = when {
         layout.isGestureBatch ||
                 (layout.emojiMatches.isEmpty() && layout.presentableSuggestions.size <= 1) ->
-            suggestionItem(layout.presentableSuggestions.firstOrNull())
+            listOf(layout.presentableSuggestions.firstOrNull())
 
         layout.autocorrectMatch != null -> {
             var supplementalSuggestionIndex = 0
-            if(layout.emojiMatches.isEmpty()) {
-                suggestionItem(layout.sortedMatches.getOrNull(supplementalSuggestionIndex++))
+            val first = if(layout.emojiMatches.isEmpty()) {
+                layout.sortedMatches.getOrNull(supplementalSuggestionIndex++)
             } else {
-                suggestionItem(layout.emojiMatches[0])
+                layout.emojiMatches[0]
             }
-            SuggestionSeparator()
-            suggestionItem(layout.autocorrectMatch)
-            SuggestionSeparator()
-
-            if(layout.verbatimWord != null && layout.verbatimWord.mWord != layout.autocorrectMatch.mWord) {
-                suggestionItem(layout.verbatimWord)
+            val third = if(layout.verbatimWord != null && layout.verbatimWord.mWord != layout.autocorrectMatch.mWord) {
+                layout.verbatimWord
             } else {
-                suggestionItem(layout.sortedMatches.getOrNull(supplementalSuggestionIndex))
+                layout.sortedMatches.getOrNull(supplementalSuggestionIndex++)
             }
+            listOf(
+                first,
+                layout.autocorrectMatch,
+                third,
+                layout.sortedMatches.getOrNull(supplementalSuggestionIndex)
+            )
         }
 
         else -> {
             var supplementalSuggestionIndex = 1
-            if(layout.emojiMatches.isEmpty()) {
-                suggestionItem(layout.sortedMatches.getOrNull(supplementalSuggestionIndex++))
+            val first = if(layout.emojiMatches.isEmpty()) {
+                layout.sortedMatches.getOrNull(supplementalSuggestionIndex++)
             } else {
-                suggestionItem(layout.emojiMatches[0])
+                layout.emojiMatches[0]
             }
-            SuggestionSeparator()
-            suggestionItem(layout.sortedMatches.getOrNull(0))
-            SuggestionSeparator()
-            suggestionItem(layout.sortedMatches.getOrNull(supplementalSuggestionIndex))
+            val third = layout.sortedMatches.getOrNull(supplementalSuggestionIndex++)
+            listOf(
+                first,
+                layout.sortedMatches.getOrNull(0),
+                third,
+                layout.sortedMatches.getOrNull(supplementalSuggestionIndex)
+            )
         }
+    }
+
+    for((i, slot) in slots.withIndex()) {
+        if(slot == null) break
+        if(i > 0) SuggestionSeparator()
+        suggestionItem(slot)
     }
 }
 
