@@ -34,7 +34,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-depth: 0
+          # The swipe/voice models in the submodules are stored with Git LFS;
+          # without lfs the APK would contain pointer text files instead of models.
+          lfs: true
+          fetch-depth: 1
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
