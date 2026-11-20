@@ -183,6 +183,12 @@ public final class Suggest {
             final boolean suppressAutoCorrection
     ) {
         final String typedWordString = wordComposer.getTypedWord();
+
+        // Studio Keys: let the pboard vocabulary add the words that continue what is being typed.
+        // They rank just below the best suggestion, so auto-correction decisions are unchanged.
+        org.futo.inputmethod.latin.xlm.PboardBrain.addCompletions(
+                suggestionResults, typedWordString, locale);
+
         final int trailingSingleQuotesCount =
                 StringUtils.getTrailingSingleQuotesCount(typedWordString);
         final String consideredWord = trailingSingleQuotesCount > 0

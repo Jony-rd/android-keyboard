@@ -389,6 +389,11 @@ class LatinIME : InputMethodServiceCompose(), LatinIMELegacy.SuggestionStripCont
 
         JniUtils.loadNativeLibrary()
 
+        // Studio Keys: start loading the borrowed pboard language model in the background. It is
+        // optional: if it cannot load, the keyboard keeps using its own suggestions.
+        org.futo.inputmethod.latin.xlm.PboardBrain.init(this)
+
+
         LayoutManager.init(this)
 
         DataStoreHelper.init(this)

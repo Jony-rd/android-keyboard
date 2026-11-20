@@ -1,0 +1,40 @@
+pboard language packs (en.lm, en_GB.lmo, en_US.lmo, en.nnlm)
+=============================================================
+
+These files contain statistics (pruned, quantised n-gram probabilities, word frequencies and spelling-variant
+preferences; for en.nnlm, the int8 weights of a small LSTM language model trained on the same text) derived
+from the corpora listed below. They are licensed under the Creative Commons
+Attribution-ShareAlike 4.0 International licence (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0/
+Build pipeline and full audit: tools/lm/ and docs/data-licenses.md in the pboard source repository.
+
+Derived from:
+- Tatoeba (https://tatoeba.org), CC BY 2.0 FR.
+- Topical-Chat, Amazon.com, Inc. (https://github.com/alexa/Topical-Chat), CDLA-Sharing-1.0.
+- Taskmaster-1/2/3, Google LLC (https://github.com/google-research-datasets/Taskmaster), CC BY 4.0.
+- MultiWOZ 2.1 (https://github.com/budzianowski/multiwoz), MIT licence.
+- Schema-Guided Dialogue, Google LLC (https://github.com/google-research-datasets/dstc8-schema-guided-dialogue),
+  CC BY-SA 4.0.
+- Blended Skill Talk, EmpatheticDialogues, Wizard of Wikipedia, Meta Platforms (ParlAI, https://parl.ai),
+  CC BY 4.0.
+- OpenAssistant Conversations oasst1/oasst2 (https://huggingface.co/datasets/OpenAssistant), Apache-2.0.
+- Anthropic HH-RLHF (https://github.com/anthropics/hh-rlhf), MIT licence.
+- WildChat-1M, Allen Institute for AI (https://huggingface.co/datasets/allenai/WildChat-1M), ODC-By 1.0.
+- FineWeb, Hugging Face (https://huggingface.co/datasets/HuggingFaceFW/fineweb), ODC-By 1.0; contains
+  Common Crawl data subject to the Common Crawl terms of use.
+- Leipzig Corpora Collection, eng-uk_web-public_2018 and eng-uk_web_2002 (https://wortschatz.uni-leipzig.de),
+  CC BY 4.0. D. Goldhahn, T. Eckart, U. Quasthoff: Building Large Monolingual Dictionaries at the Leipzig
+  Corpora Collection: From 100 to 200 Languages. LREC 2012.
+- Wikipedia (https://www.wikipedia.org), CC BY-SA 4.0.
+- wordfreq, Robyn Speer (https://github.com/rspeer/wordfreq), data CC BY-SA 4.0; includes data from
+  SUBTLEX (Brysbaert et al.), Google Books Ngrams (http://books.google.com/ngrams) and OpenSubtitles
+  (http://www.opensubtitles.org) via OPUS.
+- SCOWL and VarCon word lists, Copyright 2000-2020 Kevin Atkinson, Copyright 2016 Benjamin Titze:
+  "Permission to use, copy, modify, distribute and sell these word lists, the associated scripts, the output
+  created from the scripts, and its documentation for any purpose is hereby granted without fee, provided
+  that the above copyright notice appears in all copies and that both that copyright notice and this
+  permission notice appear in supporting documentation. Kevin Atkinson makes no representations about the
+  suitability of this array for any purpose. It is provided "as is" without express or implied warranty."
+  VarCon includes data from Ispell, Copyright 1993 Geoff Kuenning, Granada Hills, CA, redistributed under
+  the Ispell licence (notice retained).
+- List of Dirty, Naughty, Obscene, and Otherwise Bad Words, Shutterstock
+  (https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words), CC BY 4.0 (adapted).
