@@ -10,5 +10,5 @@
     <string name="english_ime_settings">Studio Keys Settings</string>
 
     <!-- Title for the spell checking service settings screen. "FUTO" should not be translated. -->
-    <string name="android_spell_checker_settings">FUTO Spell Checker Settings</string>
+    <string name="android_spell_checker_settings">Studio Keys Spell Checker Settings</string>
 </resources>
