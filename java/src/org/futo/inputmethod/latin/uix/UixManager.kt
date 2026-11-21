@@ -27,6 +27,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -147,6 +148,7 @@ import org.futo.inputmethod.updates.retrieveSavedLastUpdateCheckResult
 import org.futo.inputmethod.v2keyboard.ComputedKeyboardSize
 import org.futo.inputmethod.v2keyboard.getPrimaryLayoutOverride
 import org.futo.inputmethod.v2keyboard.FloatingKeyboardSize
+import org.futo.inputmethod.v2keyboard.KeyboardMode
 import org.futo.inputmethod.v2keyboard.KeyboardSizingCalculator
 import org.futo.inputmethod.v2keyboard.OneHandedDirection
 import org.futo.inputmethod.v2keyboard.OneHandedKeyboardSize
@@ -1063,26 +1065,58 @@ class UixManager(private val latinIME: LatinIME) {
         // Bottom drag bar
         Box(modifier = Modifier
             .fillMaxWidth()
-            .height(32.dp)
+            .height(40.dp)
             .pointerInput(pointerInputKey) {
                 detectDragGestures(
                     onDrag = { _, dragAmount -> onDragged(dragAmount) },
                     onDragEnd = { onDragEnd() })
             }
         ) {
-            IconButton(onClick = {
-                onActionActivated(KeyboardModeAction)
-            }, Modifier.align(Alignment.CenterEnd)) {
+            // Close button, deliberately larger than the other buttons in the bar so it is easy to
+            // hit while the keyboard is floating around
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .size(72.dp, 40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable {
+                        // Same effect as pressing back while the keyboard is floating
+                        latinIME.requestHideSelf(0)
+                    },
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
-                    painterResource(R.drawable.keyboard_gear),
-                    contentDescription = stringResource(R.string.action_keyboard_modes_title),
-                    tint = LocalKeyboardScheme.current.onSurfaceVariant
+                    painterResource(R.drawable.close),
+                    contentDescription = stringResource(R.string.action_keyboard_modes_close_floating),
+                    tint = LocalKeyboardScheme.current.onSurfaceVariant,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+
+            // Docks the keyboard again, so it takes the whole width like the standard keyboard
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(56.dp, 40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable {
+                        latinIME.sizingCalculator.editSavedSettings {
+                            it.copy(currentMode = KeyboardMode.Regular)
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painterResource(R.drawable.maximize),
+                    contentDescription = stringResource(R.string.action_keyboard_modes_standard),
+                    tint = LocalKeyboardScheme.current.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
                 )
             }
 
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.6f)
+                    .fillMaxWidth(0.3f)
                     .height(4.dp)
                     .align(Alignment.Center)
                     .background(

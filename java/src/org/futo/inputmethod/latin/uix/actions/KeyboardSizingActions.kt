@@ -68,6 +68,24 @@ internal fun RowScope.KeyboardMode(iconRes: Int, checkedIconRes: Int, name: Stri
     }
 }
 
+val FloatingModeAction = Action(
+    icon = R.drawable.keyboard_float,
+    name = R.string.action_float_mode_title,
+    simplePressImpl = { manager, _ ->
+        manager.getSizingCalculator().toggleFloatingMode()
+    },
+    windowImpl = null,
+)
+
+val OneHandedModeAction = Action(
+    icon = R.drawable.keyboard_left_handed,
+    name = R.string.action_one_handed_mode_title,
+    simplePressImpl = { manager, _ ->
+        manager.getSizingCalculator().toggleOneHandedMode()
+    },
+    windowImpl = null,
+)
+
 val KeyboardModeAction = Action(
     icon = R.drawable.keyboard_gear,
     name = R.string.action_keyboard_modes_title,

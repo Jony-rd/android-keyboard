@@ -17,6 +17,9 @@
     <string name="action_cursor_down_title">Arrow Down</string>
     <string name="action_cursor_left_title">Arrow Left</string>
     <string name="action_cursor_right_title">Arrow Right</string>
+    <!-- Keyboard mode toggle actions. Pressing again goes back to the standard keyboard -->
+    <string name="action_float_mode_title">Floating Keyboard</string>
+    <string name="action_one_handed_mode_title">One-Handed Keyboard</string>
 
     <!-- For emoji menu action -->
     <string name="action_emoji_title">Emojis</string>
@@ -107,6 +110,7 @@
     <string name="action_keyboard_modes_title">Keyboard Modes</string>
     <string name="action_keyboard_modes_go_back">Go back</string>
     <string name="action_keyboard_modes_resize_keyboard">Resize Keyboard</string>
+    <string name="action_keyboard_modes_close_floating">Close floating keyboard</string>
     <!-- This string must be super short (below 10 chars if possible). The title for standard QWERTYUIOP keyboard mode, filling full screen width. -->
     <string name="action_keyboard_modes_standard">Standard</string>
     <!-- This string must be super short (below 10 chars if possible). The title for one-handed QWERTYUIOP keyboard mode, filling 2/3 screen width on one side -->
@@ -508,6 +512,8 @@
     <!-- Theme, as in visual style -->
     <string name="theme_settings_title">Theme</string>
     <string name="theme_settings_key_borders">Key borders</string>
+    <string name="theme_settings_glassy_keys">Glass keys</string>
+    <string name="theme_settings_glassy_keys_subtitle">Frosted, raised keys that let your background photo show through</string>
     <string name="theme_settings_default_themes">Built-in</string>
     <string name="theme_settings_seasonal_themes">Seasonal</string>
     <string name="theme_settings_custom_themes">Your themes</string>

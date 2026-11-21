@@ -634,6 +634,11 @@ enum class KeyVisualStyle {
     Spacebar,
 
     /**
+     * Raised, glass-like buttons with an accent tint, used for the cursor arrow row
+     */
+    Raised,
+
+    /**
      * Visual style for moreKeys
      */
     MoreKey,

@@ -91,12 +91,12 @@ val ArrowRow = Row(
     ),
     attributes = KeyAttributes(
         width = KeyWidth.Grow,
-        style = KeyVisualStyle.NoBackground,
+        style = KeyVisualStyle.Raised,
         showPopup = false,
         repeatableEnabled = true
     ),
     splittable = false,
-    rowHeight = 0.8
+    rowHeight = 1.0
 )
 
 data class LayoutParams(

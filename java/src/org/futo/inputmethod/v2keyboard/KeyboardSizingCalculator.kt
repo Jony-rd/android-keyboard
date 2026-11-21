@@ -394,6 +394,32 @@ class KeyboardSizingCalculator(val context: Context, val uixManager: UixManager)
         currentMode = if(it.prefersSplit) KeyboardMode.Split else KeyboardMode.Regular
     ) }
 
+    private fun modeAfterLeaving(mode: KeyboardMode, prefersSplit: Boolean): KeyboardMode =
+        when(mode) {
+            KeyboardMode.Split -> KeyboardMode.Regular
+            else -> if(prefersSplit) KeyboardMode.Split else KeyboardMode.Regular
+        }
+
+    /** Toggles floating mode, tapping again returns to the docked keyboard */
+    fun toggleFloatingMode() = editSavedSettings { settings ->
+        when(settings.currentMode) {
+            KeyboardMode.Floating -> settings.copy(
+                currentMode = modeAfterLeaving(settings.currentMode, settings.prefersSplit)
+            )
+            else -> settings.copy(currentMode = KeyboardMode.Floating)
+        }
+    }
+
+    /** Toggles one-handed mode, tapping again returns to the docked keyboard */
+    fun toggleOneHandedMode() = editSavedSettings { settings ->
+        when(settings.currentMode) {
+            KeyboardMode.OneHanded -> settings.copy(
+                currentMode = modeAfterLeaving(settings.currentMode, settings.prefersSplit)
+            )
+            else -> settings.copy(currentMode = KeyboardMode.OneHanded)
+        }
+    }
+
     fun doesCurrentLayoutSupportSplit(): Boolean {
         val layoutName = uixManager.getCurrentLayoutName()
         val layout = try {
@@ -483,7 +509,7 @@ class KeyboardSizingCalculator(val context: Context, val uixManager: UixManager)
                     else -> 0.0
                 } +
                 when { // Arrow row height
-                    settings.mIsArrowRowEnabled -> 0.8
+                    settings.mIsArrowRowEnabled -> 1.0
                     else -> 0.0
                 }
 

@@ -31,6 +31,7 @@ import org.futo.inputmethod.latin.R
 import org.futo.inputmethod.latin.uix.actions.AllActions
 import org.futo.inputmethod.latin.uix.actions.AllActionsMap
 import org.futo.inputmethod.latin.uix.theme.AdvancedThemeMatcher
+import org.futo.inputmethod.latin.uix.theme.GlassKeyDrawable
 import org.futo.inputmethod.latin.uix.theme.KeyBackground
 import org.futo.inputmethod.v2keyboard.Direction
 import org.futo.inputmethod.v2keyboard.KeyVisualStyle
@@ -38,6 +39,7 @@ import org.futo.inputmethod.v2keyboard.KeyVisualStyle
 val KeyBordersSetting = SettingsKey(booleanPreferencesKey("keyBorders"), true)
 val HiddenKeysSetting = SettingsKey(booleanPreferencesKey("hiddenKeys1"), false)
 val KeyHintsSetting   = SettingsKey(booleanPreferencesKey("keyHints"), false)
+val GlassyKeysSetting = SettingsKey(booleanPreferencesKey("glassyKeys"), false)
 
 fun<T> Preferences.get(key: SettingsKey<T>): T {
     return this[key.key] ?: key.default
@@ -204,7 +206,7 @@ class BasicThemeProvider(val context: Context, val colorScheme: KeyboardColorSch
         return icons[iconName]
     }
 
-    val keyStyles: Map<KeyVisualStyle, VisualStyleDescriptor>
+    var keyStyles: Map<KeyVisualStyle, VisualStyleDescriptor>
     override fun getKeyStyleDescriptor(visualStyle: KeyVisualStyle): VisualStyleDescriptor {
         return keyStyles[visualStyle]!!
     }
@@ -289,6 +291,47 @@ class BasicThemeProvider(val context: Context, val colorScheme: KeyboardColorSch
         icons[iconName] = drawable?.apply {
             //setTint(tint) // breaks some stuff, its set anyway before drawing in KeyboardView now ?
         }
+    }
+
+    private fun alphaColor(color: Int, alpha: Float): Int {
+        val a = ((((color ushr 24) and 0xFF) * alpha).toInt()).coerceIn(0, 255)
+        return (color and 0x00FFFFFF) or (a shl 24)
+    }
+
+    /**
+     * Frosted glass look: a translucent fill so the theme background photo shows through, a bright
+     * top edge, a dark bottom edge and a shadow that collapses when the key is pressed. Passing an
+     * accent color tints the glass with it, which is what the raised arrow keys use.
+     */
+    private fun makeGlassStyle(
+        cornerRadius: Dp,
+        foreground: Int,
+        foregroundPressed: Int,
+        accent: Int? = null,
+        extraShadowDp: Float = 0.0f
+    ): VisualStyleDescriptor {
+        val fillTopBase = if(accent != null) alphaColor(accent, 0.45f) else 0x33FFFFFF
+        val fillBottomBase = if(accent != null) alphaColor(accent, 0.12f) else 0x0AFFFFFF
+
+        fun background(isPressed: Boolean): GlassKeyDrawable = GlassKeyDrawable(
+            cornerRadiusPx = dp(cornerRadius),
+            edgePx = dp(1.dp),
+            shadowPx = dp((1.4f + extraShadowDp).dp) * (if(isPressed) 0.35f else 1.0f),
+            pressed = isPressed,
+            fillTop = if(isPressed) alphaColor(fillTopBase, 0.7f) else fillTopBase,
+            fillBottom = if(isPressed) alphaColor(fillBottomBase, 2.0f) else fillBottomBase,
+            edgeTop = if(isPressed) 0x33FFFFFF else 0x5AFFFFFF,
+            edgeBottom = if(isPressed) 0x22000000 else 0x3D000000,
+            shadowColor = 0x4D000000,
+            glossColor = if(isPressed) 0x0AFFFFFF else 0x14FFFFFF
+        )
+
+        return VisualStyleDescriptor(
+            backgroundDrawable = background(false),
+            foregroundColor = foreground,
+            backgroundDrawablePressed = background(true),
+            foregroundColorPressed = foregroundPressed
+        )
     }
 
     init {
@@ -450,6 +493,14 @@ class BasicThemeProvider(val context: Context, val colorScheme: KeyboardColorSch
                 )
             },
 
+            KeyVisualStyle.Raised to makeGlassStyle(
+                cornerRadius = 12.dp * roundness,
+                foreground = onPrimary,
+                foregroundPressed = onPrimary,
+                accent = primary,
+                extraShadowDp = 2.4f
+            ),
+
             KeyVisualStyle.Normal to if(keyBorders) {
                 makeVisualStyle(
                     keyColor,
@@ -533,6 +584,29 @@ class BasicThemeProvider(val context: Context, val colorScheme: KeyboardColorSch
                 )
             }
         )
+
+        if(context.getSettingBlocking(GlassyKeysSetting)) {
+            keyStyles = keyStyles.mapValues { (style, descriptor) ->
+                val radius = when(style) {
+                    KeyVisualStyle.Action -> actionKeyRadius
+                    KeyVisualStyle.Spacebar -> spaceCornerRadius
+                    else -> keyCornerRadius
+                }
+                val accent = when(style) {
+                    KeyVisualStyle.Action -> primary
+                    KeyVisualStyle.Raised -> primary
+                    else -> null
+                }
+
+                makeGlassStyle(
+                    cornerRadius = radius,
+                    foreground = descriptor.foregroundColor,
+                    foregroundPressed = descriptor.foregroundColorPressed,
+                    accent = accent,
+                    extraShadowDp = if(style == KeyVisualStyle.Raised) 2.0f else 0.0f
+                )
+            }
+        }
 
         keyBackground = keyStyles[KeyVisualStyle.Normal]!!.backgroundDrawable!!
 

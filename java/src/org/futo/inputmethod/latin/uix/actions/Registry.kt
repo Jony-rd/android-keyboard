@@ -43,6 +43,8 @@ val AllActionsMap = mapOf(
     "left" to ArrowLeftAction,
     "right" to ArrowRightAction,
     "font_typer" to FontTyperAction,
+    "float_mode" to FloatingModeAction,
+    "one_handed_mode" to OneHandedModeAction,
 )
 
 val ActionToId = AllActionsMap.entries.associate { it.value to it.key }
