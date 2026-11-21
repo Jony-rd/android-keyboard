@@ -27,6 +27,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -70,6 +71,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
@@ -1072,25 +1074,55 @@ class UixManager(private val latinIME: LatinIME) {
                     onDragEnd = { onDragEnd() })
             }
         ) {
-            // Close button, deliberately larger than the other buttons in the bar so it is easy to
-            // hit while the keyboard is floating around
+            // Close button. The tap area fills the whole left end of the bar, while the visible
+            // button is a small glass circle sitting right against the left edge of the keyboard.
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterStart)
-                    .size(72.dp, 40.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .size(84.dp, 40.dp)
+                    .clip(RoundedCornerShape(20.dp))
                     .clickable {
                         // Same effect as pressing back while the keyboard is floating
                         latinIME.requestHideSelf(0)
                     },
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.CenterStart
             ) {
-                Icon(
-                    painterResource(R.drawable.close),
-                    contentDescription = stringResource(R.string.action_keyboard_modes_close_floating),
-                    tint = LocalKeyboardScheme.current.onSurfaceVariant,
-                    modifier = Modifier.size(22.dp)
-                )
+                val closeShape = RoundedCornerShape(50)
+                val closeAccent = Color(0xFFFF8A80)
+
+                Box(
+                    modifier = Modifier
+                        .padding(start = 5.dp)
+                        .size(34.dp)
+                        .clip(closeShape)
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(
+                                    Color.White.copy(alpha = 0.32f),
+                                    Color.White.copy(alpha = 0.08f)
+                                )
+                            ),
+                            closeShape
+                        )
+                        .border(
+                            width = 1.3.dp,
+                            brush = Brush.verticalGradient(
+                                listOf(
+                                    closeAccent.copy(alpha = 0.95f),
+                                    closeAccent.copy(alpha = 0.45f)
+                                )
+                            ),
+                            shape = closeShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painterResource(R.drawable.close),
+                        contentDescription = stringResource(R.string.action_keyboard_modes_close_floating),
+                        tint = closeAccent,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
 
             // Docks the keyboard again, so it takes the whole width like the standard keyboard

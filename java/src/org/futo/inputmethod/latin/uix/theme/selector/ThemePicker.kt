@@ -361,6 +361,16 @@ fun ThemePicker(onDeleteCustomTheme: (String) -> Unit, onCustomTheme: () -> Unit
                 }
             ) {
                 item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                    CompositionLocalProvider(LocalLayoutDirection provides originalDirection) {
+                        SettingToggleDataStore(
+                            title = stringResource(R.string.theme_settings_glassy_keys),
+                            subtitle = stringResource(R.string.theme_settings_glassy_keys_subtitle),
+                            setting = GlassyKeysSetting
+                        )
+                    }
+                }
+
+                item(span = { GridItemSpan(maxCurrentLineSpan) }) {
                     ScreenTitle(stringResource(R.string.theme_settings_custom_themes))
                 }
 
@@ -413,18 +423,10 @@ fun ThemePicker(onDeleteCustomTheme: (String) -> Unit, onCustomTheme: () -> Unit
                 item(span = { GridItemSpan(maxCurrentLineSpan) }) {
                     if(ZipThemes.ThemeFileName.fromSetting(currentTheme) == null) {
                         CompositionLocalProvider(LocalLayoutDirection provides originalDirection) {
-                            Column {
-                                SettingToggleDataStore(
-                                    title = stringResource(R.string.theme_settings_key_borders),
-                                    setting = KeyBordersSetting
-                                )
-
-                                SettingToggleDataStore(
-                                    title = stringResource(R.string.theme_settings_glassy_keys),
-                                    subtitle = stringResource(R.string.theme_settings_glassy_keys_subtitle),
-                                    setting = GlassyKeysSetting
-                                )
-                            }
+                            SettingToggleDataStore(
+                                title = stringResource(R.string.theme_settings_key_borders),
+                                setting = KeyBordersSetting
+                            )
                         }
                     }
                 }
