@@ -51,7 +51,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.futo.inputmethod.latin.R
-import org.futo.inputmethod.latin.uix.GlassyKeysSetting
 import org.futo.inputmethod.latin.uix.KeyBordersSetting
 import org.futo.inputmethod.latin.uix.KeyboardBackground
 import org.futo.inputmethod.latin.uix.KeyboardColorScheme
@@ -360,16 +359,6 @@ fun ThemePicker(onDeleteCustomTheme: (String) -> Unit, onCustomTheme: () -> Unit
                     Arrangement.Start
                 }
             ) {
-                item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                    CompositionLocalProvider(LocalLayoutDirection provides originalDirection) {
-                        SettingToggleDataStore(
-                            title = stringResource(R.string.theme_settings_glassy_keys),
-                            subtitle = stringResource(R.string.theme_settings_glassy_keys_subtitle),
-                            setting = GlassyKeysSetting
-                        )
-                    }
-                }
-
                 item(span = { GridItemSpan(maxCurrentLineSpan) }) {
                     ScreenTitle(stringResource(R.string.theme_settings_custom_themes))
                 }

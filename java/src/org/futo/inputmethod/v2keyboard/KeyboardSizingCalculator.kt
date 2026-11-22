@@ -509,7 +509,7 @@ class KeyboardSizingCalculator(val context: Context, val uixManager: UixManager)
                     else -> 0.0
                 } +
                 when { // Arrow row height
-                    settings.mIsArrowRowEnabled -> 1.0
+                    settings.mIsArrowRowEnabled -> 1.5
                     else -> 0.0
                 }
 

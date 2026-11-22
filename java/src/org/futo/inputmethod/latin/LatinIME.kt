@@ -68,7 +68,6 @@ import org.futo.inputmethod.latin.uix.DynamicThemeProvider
 import org.futo.inputmethod.latin.uix.DynamicThemeProviderOwner
 import org.futo.inputmethod.latin.uix.EmojiTracker.useEmoji
 import org.futo.inputmethod.latin.uix.HiddenKeysSetting
-import org.futo.inputmethod.latin.uix.GlassyKeysSetting
 import org.futo.inputmethod.latin.uix.KeyBordersSetting
 import org.futo.inputmethod.latin.uix.KeyHintsSetting
 import org.futo.inputmethod.latin.uix.KeyboardColorScheme
@@ -433,9 +432,8 @@ class LatinIME : InputMethodServiceCompose(), LatinIMELegacy.SuggestionStripCont
             combine(
                 getSettingFlow(HiddenKeysSetting),
                 getSettingFlow(KeyBordersSetting),
-                getSettingFlow(KeyHintsSetting),
-                getSettingFlow(GlassyKeysSetting)
-            ) { _, _, _, _ -> Unit }.collect {
+                getSettingFlow(KeyHintsSetting)
+            ) { _, _, _ -> Unit }.collect {
                     drawableProvider?.let { provider ->
                         if(provider is BasicThemeProvider) {
                             activeThemeOption?.obtainColors?.let { f ->

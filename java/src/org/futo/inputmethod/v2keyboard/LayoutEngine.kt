@@ -96,7 +96,7 @@ val ArrowRow = Row(
         repeatableEnabled = true
     ),
     splittable = false,
-    rowHeight = 1.0
+    rowHeight = 1.5
 )
 
 data class LayoutParams(
@@ -621,8 +621,12 @@ data class LayoutEngine(
                 if(data.longPressEnabled) { KeyConsts.ACTION_FLAGS_ENABLE_LONG_PRESS } else { 0 } or
                 if(data.repeatable) { KeyConsts.ACTION_FLAGS_IS_REPEATABLE } else { 0 }
 
+        // Raised key rows (arrow row) intentionally draw taller than a standard row, so they must
+        // not be clamped back down to the standard height
         val verticalGapForKey = when {
-            keyboard.rowHeightMode.clampHeight && height > data.rowSpan * layoutParams.standardRowHeight ->
+            keyboard.rowHeightMode.clampHeight
+                    && data.style != KeyVisualStyle.Raised
+                    && height > data.rowSpan * layoutParams.standardRowHeight ->
                 height - data.rowSpan * layoutParams.standardRowHeight
 
             else ->

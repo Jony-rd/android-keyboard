@@ -83,7 +83,8 @@ val TemplateShiftKey = ShiftKey()
 data class DeleteKey(val attributes: KeyAttributes = KeyAttributes()) : TemplatedKey {
     override val templateKey: Key = BaseKey(
         spec = "!icon/delete_key|!code/key_delete",
-        attributes = KeyAttributes(repeatableEnabled = true) + attributes + FunctionalAttributes
+        // Raised (crystal) styling has to come first, the first non-null attribute wins
+        attributes = KeyAttributes(style = KeyVisualStyle.Raised) + KeyAttributes(repeatableEnabled = true) + attributes + FunctionalAttributes
     )
 }
 val TemplateDeleteKey = DeleteKey()
